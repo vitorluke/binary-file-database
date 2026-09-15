@@ -19,31 +19,38 @@ int main()
     switch(func_option){
         case 1:
           sscanf(buffer,"%d %s %s", &func_option, arquivoEntrada, arquivoSaida);
-          func1(arquivoEntrada,arquivoSaida);
+          create_table(arquivoEntrada,arquivoSaida);
+      
           break;
         case 2:
           sscanf(buffer,"%d %s", &func_option, arquivoEntrada);
-          func2(arquivoEntrada);
+          printf("2\n");
+
           break;
         case 3:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          func3(arquivoEntrada,n);
+          printf("3\n");
+
           break;
         case 4:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &rnn);
-          func4(arquivoEntrada,rnn);
+          printf("4\n");
+          
           break;
         case 5:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          func5(arquivoEntrada,n);
+          printf("5\n");
+
           break;
         case 6:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          func6(arquivoEntrada,n);
+          printf("6\n");
+
           break;
         case 7:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          func7(arquivoEntrada,n);
+          printf("7\n");
+     
           break;
         default:
           printf("ERROR: func_option out of range");

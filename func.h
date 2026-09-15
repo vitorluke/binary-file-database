@@ -21,7 +21,7 @@ typedef struct {
     char unidadeMedida;
 } Register;
 
-void func1(char *arquivoEntrada, char *arquivoSaida);
+void create_table(char *arquivoEntrada, char *arquivoSaida);
 void func2(char *arquivoEntrada);
 void func3(char *arquivoEntrada,int n);
 void func4(char *arquivoEntrada,int rnn);
