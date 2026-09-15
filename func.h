@@ -23,11 +23,11 @@ typedef struct {
 
 void func1(char *arquivoEntrada, char *arquivoSaida);
 void func2(char *arquivoEntrada);
-void func3(char *arquivoEntrada);
-void func4(char *arquivoEntrada);
-void func5(char *arquivoEntrada);
-void func6(char *arquivoEntrada);
-void func7(char *arquivoEntrada);
+void func3(char *arquivoEntrada,int n);
+void func4(char *arquivoEntrada,int rnn);
+void func5(char *arquivoEntrada,int n);
+void func6(char *arquivoEntrada,int n);
+void func7(char *arquivoEntrada,int n);
 
 
 #endif
