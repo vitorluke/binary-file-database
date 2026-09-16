@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "fornecidas.h"
 #include "func.h"
 
 void select_table(char *nomeArquivo)
@@ -47,6 +46,8 @@ void select_table(char *nomeArquivo)
 
         printf("%d %d ", registro.idPoPs, registro.idPopsConectado);
 
+
+        //Condições
         if (registro.velocidade == -1)
         {
             printf("NULO ");
@@ -69,6 +70,7 @@ void select_table(char *nomeArquivo)
 
     fclose(arquivo);
 
+    //Caso não encontre registro válido
     if(encontrou == 0){
         printf("Registro inexistente.\n");
     }

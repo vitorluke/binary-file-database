@@ -34,7 +34,7 @@ int main()
           break;
         case 4:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &rnn);
-          printf("4\n");
+          busca_rrn(arquivoEntrada,rnn);
           
           break;
         case 5:
