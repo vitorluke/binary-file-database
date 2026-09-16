@@ -22,7 +22,7 @@ typedef struct {
 } Register;
 
 void create_table(char *arquivoEntrada, char *arquivoSaida);
-void func2(char *arquivoEntrada);
+void select_table(char *arquivoEntrada);
 void func3(char *arquivoEntrada,int n);
 void func4(char *arquivoEntrada,int rnn);
 void func5(char *arquivoEntrada,int n);

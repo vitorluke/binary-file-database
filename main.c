@@ -24,7 +24,7 @@ int main()
           break;
         case 2:
           sscanf(buffer,"%d %s", &func_option, arquivoEntrada);
-          printf("2\n");
+          select_table(arquivoEntrada);
 
           break;
         case 3:

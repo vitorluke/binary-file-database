@@ -4,8 +4,6 @@
 #include "func.h"
 #include "fornecidas.h"
 
-#define TAM_HEADER 17
-#define TAM_REGISTER 18
 #define BUFFER 100
 
 void create_table(char *arquivoEntrada, char *arquivoSaida)
@@ -73,12 +71,12 @@ void create_table(char *arquivoEntrada, char *arquivoSaida)
         campo = strtok(NULL, ",");//campo é unidade de medida
         registro.unidadeMedida = campo[0];
 
-        fwrite(&registro.idPoPs,sizeof(registro.idPoPs), 1, arquivo_saida);
-        fwrite(&registro.idPopsConectado,sizeof(registro.idPopsConectado), 1,arquivo_saida);
+        fwrite(&registro.removido,sizeof(registro.removido), 1, arquivo_saida);
+        fwrite(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha), 1,arquivo_saida);
+        fwrite(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo_saida);
+        fwrite(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo_saida);
         fwrite(&registro.velocidade,sizeof(registro.velocidade),1,arquivo_saida);
         fwrite(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo_saida);
-        fwrite(&registro.removido,sizeof(registro.removido),1,arquivo_saida);
-        fwrite(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha),1,arquivo_saida);
 
     }
 
