@@ -44,7 +44,7 @@ int main()
           break;
         case 6:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          printf("6\n");
+          insert_into(arquivoEntrada, n);
 
           break;
         case 7:
