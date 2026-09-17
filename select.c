@@ -124,7 +124,7 @@ void select_where(char *arquivoEntrada,int n){
             scanf("%s", valorCampo);
 
             if(!strcmp(nomeCampo, "unidadeMedida")){ //Coloca no filtro os campos
-                filtroBusca.unidadeMedida = valorCampo[0];
+                filtroBusca.unidadeMedida = valorCampo[1];
             }else if(!strcmp(nomeCampo, "velocidade")){
                 filtroBusca.velocidade =  atoi(valorCampo);
             }else if(!strcmp(nomeCampo, "idPoPsConectado")){
@@ -214,12 +214,9 @@ void select_where(char *arquivoEntrada,int n){
     if(encontrou == 0){
         printf("Registro inexistente.\n");
     }
+
+    printf("\n");
     }
 
-    
-
-
-    fclose(arquivo);
-
-    
+    fclose(arquivo); 
 }

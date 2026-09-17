@@ -141,10 +141,6 @@ void delete_register(char *arquivoEntrada,int n){
         cabecalho.topoPilha = rrnRemovido;  //Atualiza na memoria RAM o topo da pilha
     
     }
-        //Caso não encontre registro válido
-    if(encontrou == 0){
-        printf("Registro inexistente.\n");
-    }
     }
 
     
