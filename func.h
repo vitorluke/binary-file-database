@@ -25,9 +25,8 @@ void create_table(char *arquivoEntrada, char *arquivoSaida);
 void select_table(char *arquivoEntrada);
 void select_where(char *arquivoEntrada,int n);
 void busca_rrn(char *arquivoEntrada,int rnn);
-void func5(char *arquivoEntrada,int n);
+void delete_register(char *arquivoEntrada,int n);
 void func6(char *arquivoEntrada,int n);
 void func7(char *arquivoEntrada,int n);
-
 
 #endif

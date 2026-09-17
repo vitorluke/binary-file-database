@@ -39,7 +39,7 @@ int main()
           break;
         case 5:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          printf("5\n");
+          delete_register(arquivoEntrada, n);
 
           break;
         case 6:

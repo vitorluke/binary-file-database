@@ -4,84 +4,8 @@
 #include "func.h"
 #include "fornecidas.h"
 
-void select_table(char *nomeArquivo)
-{
-    FILE *arquivo = fopen(nomeArquivo, "rb");
-
-    if (arquivo == NULL)
-    {
-        printf("Falha no processamento do arquivo.\n");
-        return;
-    }
-
-    //Criação do cabecalho
-    Header cabecalho;
-
-    //Leitura do cabecalho
-    fread(&cabecalho.status, sizeof(cabecalho.status),1,arquivo);
-    fread(&cabecalho.topoPilha,sizeof(cabecalho.topoPilha),1,arquivo);
-    fread(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN),1,arquivo);
-    fread(&cabecalho.nroRegRem,sizeof(cabecalho.nroRegRem),1,arquivo);
-    fread(&cabecalho.nroPares,sizeof(cabecalho.nroPares),1,arquivo);
-
-    //Criação do registro
-    Register registro;
-
-    int encontrou = 0;
-    /* Enquanto for possível ler o primeiro campo do registro
-    Continuamos percorrendo o arquivo*/
-    while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
-    {
-        fread(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha),1,arquivo);
-        fread(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo);
-        fread(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo);
-        fread(&registro.velocidade,sizeof(registro.velocidade),1,arquivo);
-        fread(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo);
-
-        // Registro logicamente removido não imprime
-        if ( registro.removido == '1')
-        {
-            continue;
-        }
-
-        encontrou = 1;
-
-        printf("%d %d ", registro.idPoPs, registro.idPopsConectado);
-
-
-        //Condições
-        if (registro.velocidade == -1)
-        {
-            printf("NULO ");
-        }
-        else
-        {
-            printf("%d ", registro.velocidade);
-        }
-
-        if (registro.unidadeMedida == '$')
-        {
-            printf("NULO\n");
-        }
-        else
-        {
-            printf("\"%c\"\n", registro.unidadeMedida);
-        }
-    
-    }
-
-    fclose(arquivo);
-
-    //Caso não encontre registro válido
-    if(encontrou == 0){
-        printf("Registro inexistente.\n");
-    }
-
-}
-
-
-void select_where(char *arquivoEntrada,int n){
-    FILE *arquivo = fopen(arquivoEntrada, "rb");
+void delete_register(char *arquivoEntrada,int n){
+    FILE *arquivo = fopen(arquivoEntrada, "rb+");
 
     if (arquivo == NULL)
     {
@@ -142,18 +66,25 @@ void select_where(char *arquivoEntrada,int n){
 
     fseek(arquivo, 17, SEEK_SET);   //Volta para o final do cabeçalho
 
+    int posByte = 17;   //Posicao do primeiro registro
+
     /* Enquanto for possível ler o primeiro campo do registro
     Continuamos percorrendo o arquivo*/
     while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
     {
-        
+        posByte++;
         fread(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha),1,arquivo);
+        posByte += 4;
         fread(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo);
+        posByte += 4;
         fread(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo);
+        posByte += 4;
         fread(&registro.velocidade,sizeof(registro.velocidade),1,arquivo);
+        posByte += 4;
         fread(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo);
+        posByte++;
 
-        // Registro logicamente removido não imprime
+        // Registro logicamente removido
         if ( registro.removido == '1')
         {
             continue;
@@ -183,31 +114,22 @@ void select_where(char *arquivoEntrada,int n){
 
         if(passouFiltro == 1) continue;
 
-        
-
         encontrou = 1;
-
-        printf("%d %d ", registro.idPoPs, registro.idPopsConectado);
-
-
-        //Condições
-        if (registro.velocidade == -1)
-        {
-            printf("NULO ");
+        int posRemovido = posByte - 18;
+        int rrnRemovido = (posRemovido - 17)/18;
+        fseek(arquivo, posRemovido, SEEK_SET); 
+        fwrite("1", sizeof(char), 1, arquivo);
+        fwrite(&cabecalho.topoPilha, sizeof(int), 1, arquivo);
+        fseek(arquivo, 1, SEEK_SET);
+        fwrite(&rrnRemovido, sizeof(int), 1, arquivo);
+        fseek(arquivo, 9, SEEK_SET);
+        cabecalho.nroRegRem++;
+        fwrite(&cabecalho.nroRegRem, sizeof(int), 1, arquivo);
+        fseek(arquivo, posRemovido + 5, SEEK_SET);
+        for(int h = 0; h <= 12; h++){
+            fwrite("$", sizeof(char), 1, arquivo);
         }
-        else
-        {
-            printf("%d ", registro.velocidade);
-        }
-
-        if (registro.unidadeMedida == '$')
-        {
-            printf("NULO\n");
-        }
-        else
-        {
-            printf("\"%c\"\n", registro.unidadeMedida);
-        }
+        cabecalho.topoPilha = rrnRemovido;
     
     }
         //Caso não encontre registro válido
@@ -221,5 +143,5 @@ void select_where(char *arquivoEntrada,int n){
 
     fclose(arquivo);
 
-    
+    BinarioNaTela(arquivoEntrada);
 }
