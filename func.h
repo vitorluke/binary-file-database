@@ -23,7 +23,7 @@ typedef struct {
 
 void create_table(char *arquivoEntrada, char *arquivoSaida);
 void select_table(char *arquivoEntrada);
-void func3(char *arquivoEntrada,int n);
+void select_where(char *arquivoEntrada,int n);
 void busca_rrn(char *arquivoEntrada,int rnn);
 void func5(char *arquivoEntrada,int n);
 void func6(char *arquivoEntrada,int n);

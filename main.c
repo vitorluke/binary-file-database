@@ -29,7 +29,7 @@ int main()
           break;
         case 3:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          printf("3\n");
+          select_where(arquivoEntrada, n);
 
           break;
         case 4:
