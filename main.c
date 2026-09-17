@@ -52,7 +52,7 @@ int main()
           break;
         case 7:
           sscanf(buffer,"%d %s %d", &func_option, arquivoEntrada, &n);
-          printf("7\n");
+          update(arquivoEntrada, n);
      
           break;
         default:
