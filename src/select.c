@@ -227,23 +227,19 @@ void select_where(char *arquivoEntrada, char *arquivoIndice, int n)
         fclose(arqIndice);
         return;
     }
-
-    // Calcula a quantidade de registros no arquivo de índice (cada entrada tem 12 bytes)
-    fseek(arqIndice, 0, SEEK_END);
-    long tamanhoArqIndice = ftell(arqIndice);
-    int totalIndices = (tamanhoArqIndice - 1) / (sizeof(int) + sizeof(int64_t));
-
-    // Carrega o índice primário para a memória principal
+    // Carrega o índice primário para a memória principal lendo até o fim do arquivo
     IndexEntry *indice = NULL;
-    if (totalIndices > 0)
+    int totalIndices = 0;
+    int idTemp;
+    int64_t offsetTemp;
+
+    while (fread(&idTemp, sizeof(int), 1, arqIndice) == 1 &&
+           fread(&offsetTemp, sizeof(int64_t), 1, arqIndice) == 1)
     {
-        indice = malloc(totalIndices * sizeof(IndexEntry));
-        fseek(arqIndice, 1, SEEK_SET);
-        for (int k = 0; k < totalIndices; k++)
-        {
-            fread(&indice[k].idPoPs, sizeof(int), 1, arqIndice);
-            fread(&indice[k].byteoffset, sizeof(int64_t), 1, arqIndice);
-        }
+        indice = realloc(indice, (totalIndices + 1) * sizeof(IndexEntry));
+        indice[totalIndices].idPoPs = idTemp;
+        indice[totalIndices].byteoffset = offsetTemp;
+        totalIndices++;
     }
     fclose(arqIndice);
 

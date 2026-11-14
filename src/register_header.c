@@ -39,8 +39,6 @@ void read_header(Header *cabecalho, FILE *arquivo)
 //Função de leitura de registro
 int read_register(Register *registro, FILE *arquivo)
 {
-    //Guarda o byte exato onde este registro começa
-    long inicioRegistro = ftell(arquivo);
     if (fread(&registro->removido, sizeof(char), 1, arquivo) != 1){
         return 0;
     }
@@ -51,7 +49,7 @@ int read_register(Register *registro, FILE *arquivo)
     if(registro->removido == '1'){
         registro->nomePoPs = NULL; // Evita Segmentation Fault quando select.c chamar free_registers
         registro->nomePais = NULL;
-        fseek(arquivo,inicioRegistro + registro->tamanhoRegistro,SEEK_SET);
+        fseek(arquivo,registro->tamanhoRegistro - (sizeof(char) + sizeof(int)),SEEK_CUR);
         return 1;
     }
     if (fread(&registro->encadeamentoLista, sizeof(int64_t), 1, arquivo) != 1){
@@ -70,9 +68,6 @@ int read_register(Register *registro, FILE *arquivo)
     // A leitura será feita até encontrar o delimitador '|'.
     registro->nomePoPs = read_string(arquivo);
     registro->nomePais = read_string(arquivo);
-
-    //Pula para o fim do registro para evitar lixo de memória
-    fseek(arquivo, inicioRegistro + registro->tamanhoRegistro, SEEK_SET);
 
     return 1;
 }
