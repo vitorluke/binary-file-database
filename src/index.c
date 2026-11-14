@@ -17,7 +17,7 @@ typedef struct {
 } IndexEntry;
 
 // Função de comparação para ordenar o vetor de índice de forma crescente por idPoPs
-int compare_index(const void *a, const void *b)
+static int compare_index(const void *a, const void *b)
 {
     IndexEntry *regA = (IndexEntry *)a;
     IndexEntry *regB = (IndexEntry *)b;
@@ -37,7 +37,7 @@ void create_index(char *arquivoEntrada, char *arquivoIndice)
         return;
     }
 
-    // Lê e valida o cabeçalho do arquivo de dados
+    // Lê e valida o cabeçalho do arquivo de dados (25 bytes)
     Header cabecalho;
     read_header(&cabecalho, dados);
 
@@ -65,7 +65,7 @@ void create_index(char *arquivoEntrada, char *arquivoIndice)
     int qtd = 0;
 
     Register registro;
-    int64_t offsetAtual = ftell(dados); // Começa no byte 25
+    int64_t offsetAtual = 25; // O primeiro registro começa logo após o cabeçalho de 25 bytes
 
     // Percorre todos os registros do arquivo de dados
     while (read_register(&registro, dados))
@@ -78,8 +78,9 @@ void create_index(char *arquivoEntrada, char *arquivoIndice)
             qtd++;
         }
 
+        // Avança o contador de offset pelo tamanho exato do registro lido (ativo ou removido)
+        offsetAtual += registro.tamanhoRegistro;
         free_register(&registro);
-        offsetAtual = ftell(dados); // Guarda o início do próximo registro
     }
 
     // Ordena os registros de índice de forma crescente pelo idPoPs

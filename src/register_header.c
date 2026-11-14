@@ -69,6 +69,14 @@ int read_register(Register *registro, FILE *arquivo)
     registro->nomePoPs = read_string(arquivo);
     registro->nomePais = read_string(arquivo);
 
+    // Pula eventual lixo ('$') no final do registro
+    int bytesLidos = 19 + strlen(registro->nomePoPs) + 1 + strlen(registro->nomePais) + 1;
+    int lixo = registro->tamanhoRegistro - bytesLidos;
+    if (lixo > 0)
+    {
+        fseek(arquivo, lixo, SEEK_CUR);
+    }
+
     return 1;
 }
 
