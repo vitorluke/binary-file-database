@@ -8,6 +8,7 @@
 #include "../include/table.h"
 #include "../include/select.h"
 #include "../include/index.h"
+#include "../include/delete.h"
 
 
 #define BUFFER 512
@@ -55,7 +56,7 @@ int main()
 
         case 12: // 12 arquivoEntrada.bin arquivoIndicePrimario.bin n[cite: 16]
             sscanf(buffer, "%d %s %s %d", &func_option, arquivoEntrada, arquivoIndice, &n);
-            // delete_register(arquivoEntrada, arquivoIndice, n);
+            delete_register(arquivoEntrada, arquivoIndice, n);
             break;
 
         case 13: // 13 arquivoEntrada.bin arquivoIndicePrimario.bin n[cite: 18]

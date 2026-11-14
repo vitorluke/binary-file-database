@@ -6,6 +6,8 @@
 
 #include "register_header.h"
 
+
+
 // Exibe os campos de um registro formatados na saída padrão
 void print_register(Register *registro);
 
