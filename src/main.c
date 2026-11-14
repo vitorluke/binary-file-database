@@ -7,10 +7,8 @@
 
 #include "../include/table.h"
 #include "../include/select.h"
-// Descomente conforme for criando os arquivos das demais funcionalidades:
-// #include "../include/index.h"
-// #include "../include/delete_insert.h"
-// #include "../include/update.h"
+#include "../include/index.h"
+
 
 #define BUFFER 512
 
@@ -42,7 +40,7 @@ int main()
 
         case 9: // 9 arquivoEntrada.bin arquivoIndicePrimario.bin[cite: 9]
             sscanf(buffer, "%d %s %s", &func_option, arquivoEntrada, arquivoIndice);
-            // create_index(arquivoEntrada, arquivoIndice);
+            create_index(arquivoEntrada, arquivoIndice);
             break;
 
         case 10: // 10 arquivoEntrada.bin[cite: 11]

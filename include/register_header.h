@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 // Struct do cabeçalho do arquivo PoPs
 typedef struct {

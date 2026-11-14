@@ -343,6 +343,8 @@ void select_where(char *arquivoEntrada, char *arquivoIndice, int n)
             printf("Registro inexistente.\n");
         }
 
+        printf("\n");
+
         free(filtroBusca.nomePoPs);
         free(filtroBusca.nomePais);
     }
