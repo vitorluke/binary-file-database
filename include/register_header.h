@@ -1,3 +1,5 @@
+// NOME: Murilo Antonio de Oliveira Amatti. NroUSP: 17150041
+// NOME: Vitor Quirino Machado. NroUSP: 16904644
 
 #ifndef REGISTER_HEADER_H
 #define REGISTER_HEADER_H

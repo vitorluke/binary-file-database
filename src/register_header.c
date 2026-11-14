@@ -1,3 +1,5 @@
+// NOME: Murilo Antonio de Oliveira Amatti. NroUSP: 17150041
+// NOME: Vitor Quirino Machado. NroUSP: 16904644
 
 #include "../include/register_header.h"
 #include <stdlib.h>

@@ -1,99 +1,118 @@
-#include <stdlib.h>
+// NOME: Murilo Antonio de Oliveira Amatti. NroUSP: 17150041
+// NOME: Vitor Quirino Machado. NroUSP: 16904644
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+
 #include "../include/table.h"
 #include "../include/fornecidas.h"
+#include "../include/register_header.h"
 
-#define BUFFER 100
+// Escreve o cabeçalho de 25 bytes no início do arquivo binário
+static void write_header(Header *cab, FILE *bin)
+{
+    fseek(bin, 0, SEEK_SET);
+    fwrite(&cab->status, sizeof(char), 1, bin);
+    fwrite(&cab->topoLista, sizeof(int64_t), 1, bin);
+    fwrite(&cab->proxByteOffset, sizeof(int64_t), 1, bin);
+    fwrite(&cab->nroRegRem, sizeof(int), 1, bin);
+    fwrite(&cab->nroPoPs, sizeof(int), 1, bin);
+}
 
+// Funcionalidade [8]: Lê CSV e gera arquivo binário
 void create_table(char *arquivoEntrada, char *arquivoSaida)
 {
-    //tentativa de abertura do arquivo .csv
-    FILE *arquivo_entrada = fopen(arquivoEntrada, "rt");
+    FILE *csv = fopen(arquivoEntrada, "r");
+    FILE *bin = fopen(arquivoSaida, "wb");
 
-    char linha[BUFFER];
-    
-
-    if( arquivo_entrada == NULL)
+    if (csv == NULL || bin == NULL)
     {
+        if (csv) fclose(csv);
+        if (bin) fclose(bin);
         printf("Falha no processamento do arquivo.\n");
         return;
     }
 
-    //Criação do arquivo binário
-    FILE *arquivo_saida = fopen(arquivoSaida,"wb");
+    // Cabeçalho inicial (status '0' enquanto escreve)
+    Header cab = {'0', -1, 25, 0, 0};
+    write_header(&cab, bin);
 
-    if(arquivo_saida == NULL)
+    char linha[1024];
+    fgets(linha, sizeof(linha), csv); // Pula a primeira linha (cabeçalho do CSV)
+
+    char delim = '|';
+
+    while (fgets(linha, sizeof(linha), csv) != NULL)
     {
-        printf("Falha no processamento do arquivo.\n");
+        if (linha[0] == '\n' || linha[0] == '\r' || linha[0] == '\0')
+            continue;
+
+        // Separa os 4 campos da linha usando apenas índices simples
+        char campos[4][512] = {"", "", "", ""};
+        int col = 0, pos = 0;
+
+        for (int i = 0; linha[i] != '\0' && linha[i] != '\n' && linha[i] != '\r'; i++)
+        {
+            if (linha[i] == ',')
+            {
+                campos[col][pos] = '\0';
+                col++;
+                pos = 0;
+            }
+            else
+            {
+                campos[col][pos++] = linha[i];
+            }
+        }
+        campos[col][pos] = '\0';
+
+        // Mapeia cada coluna para sua variável correspondente
+        char *strId = campos[0];
+        char *nomePoPs = campos[1];
+        char *nomePais = campos[2];
+        char *strSigla = campos[3];
+
+        // Prepara os campos do registro
+        char removido = '0';
+        int64_t encadeamento = -1;
+        int idPoPs = (strlen(strId) == 0) ? -1 : atoi(strId);
+
+        char siglaPais[2] = {'$', '$'};
+        if (strlen(strSigla) >= 2)
+        {
+            siglaPais[0] = strSigla[0];
+            siglaPais[1] = strSigla[1];
+        }
+
+        int tamPoPs = strlen(nomePoPs);
+        int tamPais = strlen(nomePais);
+        int tamanhoRegistro = 19 + tamPoPs + 1 + tamPais + 1;
+
+        // Grava campo a campo
+        fwrite(&removido, sizeof(char), 1, bin);
+        fwrite(&tamanhoRegistro, sizeof(int), 1, bin);
+        fwrite(&encadeamento, sizeof(int64_t), 1, bin);
+        fwrite(&idPoPs, sizeof(int), 1, bin);
+        fwrite(siglaPais, sizeof(char), 2, bin);
+
+        fwrite(nomePoPs, sizeof(char), tamPoPs, bin);
+        fwrite(&delim, sizeof(char), 1, bin);
+
+        fwrite(nomePais, sizeof(char), tamPais, bin);
+        fwrite(&delim, sizeof(char), 1, bin);
+
+        cab.proxByteOffset += tamanhoRegistro;
+        cab.nroPoPs++;
     }
 
-    //Criação do Cabeçalho
-    Header cabecalho;
-    cabecalho.status = '0';
-    cabecalho.topoPilha = -1;
-    cabecalho.proxRRN = 0;
-    cabecalho.nroRegRem = 0;
-    cabecalho.nroPares = 0;
+    // Atualiza cabeçalho final com status '1'
+    cab.status = '1';
+    write_header(&cab, bin);
 
-    //Escrita inicial do header
-    fwrite(&cabecalho.status,sizeof(cabecalho.status), 1, arquivo_saida);
-    fwrite(&cabecalho.topoPilha, sizeof(cabecalho.topoPilha), 1, arquivo_saida);
-    fwrite(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN), 1, arquivo_saida);
-    fwrite(&cabecalho.nroRegRem, sizeof(cabecalho.nroRegRem), 1, arquivo_saida);
-    fwrite(&cabecalho.nroPares, sizeof(cabecalho.nroPares), 1, arquivo_saida);
+    fclose(csv);
+    fclose(bin);
 
-    //captura da primeira linha do csv
-    fgets(linha, sizeof(linha), arquivo_entrada);
-
-    int i = 0;
-
-    while(fgets(linha, sizeof(linha), arquivo_entrada) != NULL)
-    {
-        i++;
-
-        Register registro;
-
-        registro.removido = '0';
-        registro.encadeamentoPilha = -1;
-
-        char *campo;
-
-        campo = strtok(linha, ",");//campo é idPops
-        registro.idPoPs = atoi(campo);
-
-        campo = strtok(NULL, ",");//campo é idPopsConectado
-        registro.idPopsConectado = atoi(campo);
-
-        campo = strtok(NULL, ",");//campo é velocidade
-        registro.velocidade = atoi(campo);
-
-        campo = strtok(NULL, ",");//campo é unidade de medida
-        registro.unidadeMedida = campo[0];
-
-        fwrite(&registro.removido,sizeof(registro.removido), 1, arquivo_saida);
-        fwrite(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha), 1,arquivo_saida);
-        fwrite(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo_saida);
-        fwrite(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo_saida);
-        fwrite(&registro.velocidade,sizeof(registro.velocidade),1,arquivo_saida);
-        fwrite(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo_saida);
-
-    }
-
-    cabecalho.status = '1';
-    cabecalho.proxRRN = i;
-    cabecalho.nroPares = i;
-    fseek(arquivo_saida,0,SEEK_SET);
-    fwrite(&cabecalho.status,sizeof(cabecalho.status),1,arquivo_saida);
-    fwrite(&cabecalho.topoPilha, sizeof(cabecalho.topoPilha), 1, arquivo_saida);
-    fwrite(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN), 1, arquivo_saida);
-    fwrite(&cabecalho.nroRegRem, sizeof(cabecalho.nroRegRem), 1, arquivo_saida);
-    fwrite(&cabecalho.nroPares, sizeof(cabecalho.nroPares), 1, arquivo_saida);
-
-    fclose(arquivo_entrada);
-    fclose(arquivo_saida);
-    
-
-    BinarioNaTela(arquivoSaida);
-
+    binarioNaTela(arquivoSaida);
 }
