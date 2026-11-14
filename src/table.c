@@ -11,7 +11,7 @@
 #include "../include/register_header.h"
 
 // Escreve o cabeçalho de 25 bytes no início do arquivo binário
-static void write_header(Header *cab, FILE *bin)
+void write_header(Header *cab, FILE *bin)
 {
     fseek(bin, 0, SEEK_SET);
     fwrite(&cab->status, sizeof(char), 1, bin);
@@ -49,8 +49,8 @@ void create_table(char *arquivoEntrada, char *arquivoSaida)
         if (linha[0] == '\n' || linha[0] == '\r' || linha[0] == '\0')
             continue;
 
-        // Separa os 4 campos da linha usando apenas índices simples
-        char campos[4][512] = {"", "", "", ""};
+        // Separa as 5 colunas da linha: [0]=indice, [1]=idPoPs, [2]=nomePoPs, [3]=nomePais, [4]=siglaPais
+        char campos[5][512] = {"", "", "", "", ""};
         int col = 0, pos = 0;
 
         for (int i = 0; linha[i] != '\0' && linha[i] != '\n' && linha[i] != '\r'; i++)
@@ -68,11 +68,11 @@ void create_table(char *arquivoEntrada, char *arquivoSaida)
         }
         campos[col][pos] = '\0';
 
-        // Mapeia cada coluna para sua variável correspondente
-        char *strId = campos[0];
-        char *nomePoPs = campos[1];
-        char *nomePais = campos[2];
-        char *strSigla = campos[3];
+        // Ignora campos[0] e mapeia as 4 colunas de dados
+        char *strId = campos[1];
+        char *nomePoPs = campos[2];
+        char *nomePais = campos[3];
+        char *strSigla = campos[4];
 
         // Prepara os campos do registro
         char removido = '0';
