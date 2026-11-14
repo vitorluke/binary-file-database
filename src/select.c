@@ -274,7 +274,7 @@ void select_where(char *arquivoEntrada, char *arquivoIndice, int n)
             char valorCampo[1000];
 
             scanf("%s", nomeCampo);
-            scan_quote_string(valorCampo);
+            ScanQuoteString(valorCampo);
 
             if (!strcmp(nomeCampo, "idPoPs"))
             {

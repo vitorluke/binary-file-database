@@ -114,5 +114,5 @@ void create_table(char *arquivoEntrada, char *arquivoSaida)
     fclose(csv);
     fclose(bin);
 
-    binarioNaTela(arquivoSaida);
+    BinarioNaTela(arquivoSaida);
 }

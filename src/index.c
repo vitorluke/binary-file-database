@@ -105,5 +105,5 @@ void create_index(char *arquivoEntrada, char *arquivoIndice)
     fclose(idx);
 
     // Exibe o arquivo de índice gerado conforme especificação
-    binarioNaTela(arquivoIndice);
+    BinarioNaTela(arquivoIndice);
 }
