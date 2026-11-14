@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "func.h"
-#include "fornecidas.h"
+#include "../include/delete_insert.h"
+#include "../include/fornecidas.h"
 
 void delete_register(char *arquivoEntrada,int n){
     FILE *arquivo = fopen(arquivoEntrada, "rb+");
@@ -17,11 +17,15 @@ void delete_register(char *arquivoEntrada,int n){
     Header cabecalho;
 
     //Leitura do cabecalho
-    fread(&cabecalho.status, sizeof(cabecalho.status),1,arquivo);
-    fread(&cabecalho.topoPilha,sizeof(cabecalho.topoPilha),1,arquivo);
-    fread(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN),1,arquivo);
-    fread(&cabecalho.nroRegRem,sizeof(cabecalho.nroRegRem),1,arquivo);
-    fread(&cabecalho.nroPares,sizeof(cabecalho.nroPares),1,arquivo);
+    read_header(&cabecalho, arquivo);
+
+    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
+        printf("Arquivo corrompido!");
+        return;
+    }
+
+
+    
 
     //Atualiza o status do cabeçalho para 0
     fseek(arquivo, 0, SEEK_SET);
@@ -76,17 +80,8 @@ void delete_register(char *arquivoEntrada,int n){
     Continuamos percorrendo o arquivo*/
     while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
     {
-        posByte++;
-        fread(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha),1,arquivo);
-        posByte += 4;
-        fread(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo);
-        posByte += 4;
-        fread(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo);
-        posByte += 4;
-        fread(&registro.velocidade,sizeof(registro.velocidade),1,arquivo);
-        posByte += 4;
-        fread(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo);
-        posByte++;
+        read_register(&registro,arquivo); //Le o registro
+        posByte += 18;
 
         // Registro logicamente removido
         if ( registro.removido == '1')
@@ -167,11 +162,12 @@ void insert_into(char *arquivoEntrada,int n){
     Header cabecalho;
 
     //Leitura do cabecalho
-    fread(&cabecalho.status, sizeof(cabecalho.status),1,arquivo);
-    fread(&cabecalho.topoPilha,sizeof(cabecalho.topoPilha),1,arquivo);
-    fread(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN),1,arquivo);
-    fread(&cabecalho.nroRegRem,sizeof(cabecalho.nroRegRem),1,arquivo);
-    fread(&cabecalho.nroPares,sizeof(cabecalho.nroPares),1,arquivo);
+    read_header(&cabecalho, arquivo);
+
+    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
+        printf("Arquivo corrompido!");
+        return;
+    }
 
     //Atualiza o status do cabeçalho para 0
     fseek(arquivo, 0, SEEK_SET);
@@ -288,11 +284,13 @@ void update(char *arquivoEntrada,int n){
     Header cabecalho;
 
     //Leitura do cabecalho
-    fread(&cabecalho.status, sizeof(cabecalho.status),1,arquivo);
-    fread(&cabecalho.topoPilha,sizeof(cabecalho.topoPilha),1,arquivo);
-    fread(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN),1,arquivo);
-    fread(&cabecalho.nroRegRem,sizeof(cabecalho.nroRegRem),1,arquivo);
-    fread(&cabecalho.nroPares,sizeof(cabecalho.nroPares),1,arquivo);
+    read_header(&cabecalho, arquivo);
+
+    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
+        printf("Arquivo corrompido!");
+        return;
+    }
+
 
     //Atualiza o status do cabeçalho para 0
     fseek(arquivo, 0, SEEK_SET);
@@ -391,17 +389,8 @@ void update(char *arquivoEntrada,int n){
     Continuamos percorrendo o arquivo*/
     while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
     {
-        posByte++;
-        fread(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha),1,arquivo);
-        posByte += 4;
-        fread(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo);
-        posByte += 4;
-        fread(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo);
-        posByte += 4;
-        fread(&registro.velocidade,sizeof(registro.velocidade),1,arquivo);
-        posByte += 4;
-        fread(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo);
-        posByte++;
+        read_register(&registro,arquivo); //Le o registro
+        posByte =+ 18;
 
         // Registro logicamente removido
         if ( registro.removido == '1')

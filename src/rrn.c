@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "func.h"
+#include "../include/rrn.h"
 
 void busca_rrn(char *nomeArquivo, int rrn) {
 
@@ -8,10 +8,22 @@ void busca_rrn(char *nomeArquivo, int rrn) {
 
     Register registro;
 
+    //Criação do cabecalho
+    Header cabecalho;
+
     arquivo = fopen(nomeArquivo, "rb");
 
     if (arquivo == NULL) {
         printf("Falha no processamento do arquivo.\n");
+        return;
+    }
+
+
+    //Leitura do cabecalho
+    read_header(&cabecalho, arquivo);
+
+    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
+        printf("Arquivo corrompido!");
         return;
     }
 

@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "func.h"
+
+#include "../include/delete_insert.h"
+#include "../include/rrn.h"
+#include "../include/select.h"
+#include "../include/table.h"
 #define BUFFER 40
 
 int main()

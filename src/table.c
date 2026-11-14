@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "func.h"
-#include "fornecidas.h"
+#include "../include/table.h"
+#include "../include/fornecidas.h"
 
 #define BUFFER 100
 

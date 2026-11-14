@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "fornecidas.h"
+#include "../include/fornecidas.h"
 
 /*
  * Você não precisa entender o código dessa função.

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "func.h"
-#include "fornecidas.h"
+#include "../include/select.h"
+#include "../include/fornecidas.h"
 
 void select_table(char *nomeArquivo)
 {
@@ -18,11 +18,12 @@ void select_table(char *nomeArquivo)
     Header cabecalho;
 
     //Leitura do cabecalho
-    fread(&cabecalho.status, sizeof(cabecalho.status),1,arquivo);
-    fread(&cabecalho.topoPilha,sizeof(cabecalho.topoPilha),1,arquivo);
-    fread(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN),1,arquivo);
-    fread(&cabecalho.nroRegRem,sizeof(cabecalho.nroRegRem),1,arquivo);
-    fread(&cabecalho.nroPares,sizeof(cabecalho.nroPares),1,arquivo);
+    read_header(&cabecalho, arquivo);
+
+    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
+        printf("Arquivo corrompido!");
+        return;
+    }
 
     //Criação do registro
     Register registro;
@@ -32,11 +33,7 @@ void select_table(char *nomeArquivo)
     Continuamos percorrendo o arquivo*/
     while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
     {
-        fread(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha),1,arquivo);
-        fread(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo);
-        fread(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo);
-        fread(&registro.velocidade,sizeof(registro.velocidade),1,arquivo);
-        fread(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo);
+        read_register(&registro,arquivo); //Le o registro
 
         // Registro logicamente removido não imprime
         if ( registro.removido == '1')
@@ -93,11 +90,12 @@ void select_where(char *arquivoEntrada,int n){
     Header cabecalho;
 
     //Leitura do cabecalho
-    fread(&cabecalho.status, sizeof(cabecalho.status),1,arquivo);
-    fread(&cabecalho.topoPilha,sizeof(cabecalho.topoPilha),1,arquivo);
-    fread(&cabecalho.proxRRN,sizeof(cabecalho.proxRRN),1,arquivo);
-    fread(&cabecalho.nroRegRem,sizeof(cabecalho.nroRegRem),1,arquivo);
-    fread(&cabecalho.nroPares,sizeof(cabecalho.nroPares),1,arquivo);
+    read_header(&cabecalho, arquivo);
+
+    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
+        printf("Arquivo corrompido!");
+        return;
+    }
 
     //Criação do registro
     Register registro;
@@ -147,11 +145,7 @@ void select_where(char *arquivoEntrada,int n){
     while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
     {
         
-        fread(&registro.encadeamentoPilha,sizeof(registro.encadeamentoPilha),1,arquivo);
-        fread(&registro.idPoPs,sizeof(registro.idPoPs),1,arquivo);
-        fread(&registro.idPopsConectado,sizeof(registro.idPopsConectado),1,arquivo);
-        fread(&registro.velocidade,sizeof(registro.velocidade),1,arquivo);
-        fread(&registro.unidadeMedida,sizeof(registro.unidadeMedida),1,arquivo);
+        read_register(&registro,arquivo); //Le o registro
 
         // Registro logicamente removido não imprime
         if ( registro.removido == '1')
