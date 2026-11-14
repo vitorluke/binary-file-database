@@ -1,12 +1,14 @@
 
 #include "../include/register_header.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 //Função para ler o campo de tamanho variavel delimitador por PIPE('|')
 char *read_string(FILE *arquivo)
 {
     char *texto = malloc(1);
     int tamanho = 0;
-    char caractere;
+    int caractere;
 
     // Loop de leitura
     while ((caractere = fgetc(arquivo)) != '|')
@@ -33,17 +35,43 @@ void read_header(Header *cabecalho, FILE *arquivo)
 }
 
 //Função de leitura de registro
-void read_register(Register *registro, FILE *arquivo)
+int read_register(Register *registro, FILE *arquivo)
 {
-    fread(&registro->removido, sizeof(char), 1, arquivo);
-    fread(&registro->tamanhoRegistro, sizeof(int), 1, arquivo);
-    fread(&registro->encadeamentoLista, sizeof(int64_t), 1, arquivo);
+    //Guarda o byte exato onde este registro começa
+    long inicioRegistro = ftell(arquivo);
+    if (fread(&registro->removido, sizeof(char), 1, arquivo) != 1){
+        return 0;
+    }
+    if (fread(&registro->tamanhoRegistro, sizeof(int), 1, arquivo) != 1){
+        return 0;
+    }
+    //Pula o registro removido logicamente
+    if(registro->removido == '1'){
+        registro->nomePoPs = NULL; // Evita Segmentation Fault quando select.c chamar free_registers
+        registro->nomePais = NULL;
+        fseek(arquivo,inicioRegistro + registro->tamanhoRegistro,SEEK_SET);
+        return 1;
+    }
+    if (fread(&registro->encadeamentoLista, sizeof(int64_t), 1, arquivo) != 1){
+        return 0;
+    }
 
-    fread(&registro->idPoPs, sizeof(int), 1, arquivo);
-    fread(registro->siglaPais, sizeof(char), 2, arquivo);
+    if(fread(&registro->idPoPs, sizeof(int), 1, arquivo) != 1){
+        return 0;
+    }
+    
+    if(fread(registro->siglaPais, sizeof(char), 2, arquivo) != 2){
+        return 0;
+    }
 
     // Os campos nomePoPs e nomePais são variáveis.
     // A leitura será feita até encontrar o delimitador '|'.
     registro->nomePoPs = read_string(arquivo);
     registro->nomePais = read_string(arquivo);
+
+    //Pula para o fim do registro para evitar lixo de memória
+    fseek(arquivo, inicioRegistro + registro->tamanhoRegistro, SEEK_SET);
+
+    return 1;
 }
+

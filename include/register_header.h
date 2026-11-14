@@ -29,6 +29,6 @@ typedef struct {
 } Register;
 
 void read_header(Header *cabecalho, FILE *arquivo);
-void read_register(Register *registro, FILE *arquivo);
+int read_register(Register *registro, FILE *arquivo);
 
 #endif

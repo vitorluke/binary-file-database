@@ -1,8 +1,39 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "../include/select.h"
 #include "../include/fornecidas.h"
+#include "../include/register_header.h"
+
+// Imprime um registro
+void print_register(Register *registro)
+{
+    printf("%d ", registro->idPoPs);
+
+    if (strcmp(registro->nomePoPs, "$") == 0)
+        printf("NULO ");
+    else
+        printf("%s ", registro->nomePoPs);
+
+    if (strcmp(registro->nomePais, "$") == 0)
+        printf("NULO ");
+    else
+        printf("%s ", registro->nomePais);
+
+    if (registro->siglaPais[0] == '$')
+        printf("NULO\n");
+    else
+        printf("%c%c\n", registro->siglaPais[0], registro->siglaPais[1]);
+}
+
+// Libera as strings do registro
+void free_register(Register *registro)
+{
+    free(registro->nomePoPs);
+    free(registro->nomePais);
+}
 
 void select_table(char *nomeArquivo)
 {
@@ -14,70 +45,52 @@ void select_table(char *nomeArquivo)
         return;
     }
 
-    //Criação do cabecalho
+    // Criação do cabeçalho
     Header cabecalho;
 
-    //Leitura do cabecalho
+    // Leitura do cabeçalho
     read_header(&cabecalho, arquivo);
 
-    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
-        printf("Arquivo corrompido!");
+    if (cabecalho.status == '0')
+    {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(arquivo);
         return;
     }
 
-    //Criação do registro
+    // Criação do registro
     Register registro;
 
     int encontrou = 0;
-    /* Enquanto for possível ler o primeiro campo do registro
-    Continuamos percorrendo o arquivo*/
-    while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
-    {
-        read_register(&registro,arquivo); //Le o registro
 
+    // Percorre os registros do arquivo
+    while (read_register(&registro, arquivo))
+    {
         // Registro logicamente removido não imprime
-        if ( registro.removido == '1')
+        if (registro.removido == '1')
         {
+            free_register(&registro);
             continue;
         }
 
         encontrou = 1;
 
-        printf("%d %d ", registro.idPoPs, registro.idPopsConectado);
+        print_register(&registro);
 
-
-        //Condições
-        if (registro.velocidade == -1)
-        {
-            printf("NULO ");
-        }
-        else
-        {
-            printf("%d ", registro.velocidade);
-        }
-
-        if (registro.unidadeMedida == '$')
-        {
-            printf("NULO\n");
-        }
-        else
-        {
-            printf("\"%c\"\n", registro.unidadeMedida);
-        }
-    
+        free_register(&registro);
     }
 
     fclose(arquivo);
 
-    //Caso não encontre registro válido
-    if(encontrou == 0){
+    // Caso não encontre registro válido
+    if (encontrou == 0)
+    {
         printf("Registro inexistente.\n");
     }
-
 }
 
-
-void select_where(char *arquivoEntrada,int n){
+void select_where(char *arquivoEntrada, int n)
+{
     FILE *arquivo = fopen(arquivoEntrada, "rb");
 
     if (arquivo == NULL)
@@ -86,131 +99,152 @@ void select_where(char *arquivoEntrada,int n){
         return;
     }
 
-    //Criação do cabecalho
+    // Criação do cabeçalho
     Header cabecalho;
 
-    //Leitura do cabecalho
+    // Leitura do cabeçalho
     read_header(&cabecalho, arquivo);
 
-    if(cabecalho.status == 0){  //Verifica se o arquivo tinha terminado corretamente sua ultima alteração
-        printf("Arquivo corrompido!");
+    if (cabecalho.status == '0')
+    {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(arquivo);
         return;
     }
 
-    //Criação do registro
+    // Criação do registro
     Register registro;
 
+    // Percorre as buscas
+    for (int i = 1; i <= n; i++)
+    {
+        Register filtroBusca;
 
-    Register filtroBusca; //Criação dos filtros
+        int m = 0;
 
-    int m = 0;  //Quantidade de pares de campos
-    for(int i = 1; i <= n; i++){    //Percorre as exigencias da busca
-        
-        m = 0;
         scanf("%d", &m);
 
-        filtroBusca.unidadeMedida = '@'; //Inicializa o filtro
-        filtroBusca.velocidade =  -2;
-        filtroBusca.idPopsConectado =  -2;
-        filtroBusca.idPoPs =  -2;
+        // Inicialização dos filtros
+        filtroBusca.idPoPs = -1;
 
-        for(int j = 1; j <= m; j++){    //Percorre os campos e os valores de cada exigencia da busca
-            char nomeCampo[20];
-            char valorCampo[20];
+        filtroBusca.nomePoPs = NULL;
+        filtroBusca.nomePais = NULL;
+
+        filtroBusca.siglaPais[0] = '@';
+
+        int buscaId = 0;
+        int buscaNomePoPs = 0;
+        int buscaNomePais = 0;
+        int buscaSiglaPais = 0;
+
+        // Leitura dos campos e valores da busca
+        for (int j = 1; j <= m; j++)
+        {
+            char nomeCampo[50];
+            char valorCampo[1000];
 
             scanf("%s", nomeCampo);
-            scanf("%s", valorCampo);
+            scan_quote_string(valorCampo);
 
-            if(!strcmp(nomeCampo, "unidadeMedida")){ //Coloca no filtro os campos
-                filtroBusca.unidadeMedida = valorCampo[1];
-            }else if(!strcmp(nomeCampo, "velocidade")){
-                filtroBusca.velocidade =  atoi(valorCampo);
-            }else if(!strcmp(nomeCampo, "idPoPsConectado")){
-                filtroBusca.idPopsConectado =  atoi(valorCampo);
-            }else if(!strcmp(nomeCampo, "idPoPs")){
-                filtroBusca.idPoPs =  atoi(valorCampo);
+            if (!strcmp(nomeCampo, "idPoPs"))
+            {
+                filtroBusca.idPoPs = atoi(valorCampo);
+                buscaId = 1;
+            }
+            else if (!strcmp(nomeCampo, "nomePoPs"))
+            {
+                filtroBusca.nomePoPs = malloc(strlen(valorCampo) + 1);
+                strcpy(filtroBusca.nomePoPs, valorCampo);
+                buscaNomePoPs = 1;
+            }
+            else if (!strcmp(nomeCampo, "nomePais"))
+            {
+                filtroBusca.nomePais = malloc(strlen(valorCampo) + 1);
+                strcpy(filtroBusca.nomePais, valorCampo);
+                buscaNomePais = 1;
+            }
+            else if (!strcmp(nomeCampo, "siglaPais"))
+            {
+                strcpy(filtroBusca.siglaPais, valorCampo);
+                buscaSiglaPais = 1;
             }
         }
-        
 
+        int encontrou = 0;
 
-    int encontrou = 0;
-    int passouFiltro = 0;   //=0 significa que passou, =1 significa que nao passou
+        // Volta para o início dos registros
+        fseek(arquivo, 25, SEEK_SET);
 
-
-    fseek(arquivo, 17, SEEK_SET);   //Volta para o final do cabeçalho
-
-    /* Enquanto for possível ler o primeiro campo do registro
-    Continuamos percorrendo o arquivo*/
-    while(fread(&registro.removido,sizeof(registro.removido),1,arquivo) == 1)
-    {
-        
-        read_register(&registro,arquivo); //Le o registro
-
-        // Registro logicamente removido não imprime
-        if ( registro.removido == '1')
+        // Percorre os registros
+        while (read_register(&registro, arquivo))
         {
-            continue;
-        }
-        
-        passouFiltro = 0;
-
-            //Aqui ocorre o filtro de cada registro
-            if(filtroBusca.idPoPs != -2 && registro.idPoPs != filtroBusca.idPoPs){
-                passouFiltro = 1;
-                continue;
-            }
-            if(filtroBusca.velocidade != -2 && registro.velocidade != filtroBusca.velocidade){
-                passouFiltro = 1;
-                continue;
-            }
-            if(filtroBusca.idPopsConectado != -2 && registro.idPopsConectado != filtroBusca.idPopsConectado){
-                passouFiltro = 1;
-                continue;
-            }
-            if(filtroBusca.unidadeMedida != '@' && registro.unidadeMedida != filtroBusca.unidadeMedida){
-                passouFiltro = 1;
+            // Registro logicamente removido não imprime
+            if (registro.removido == '1')
+            {
+                free_register(&registro);
                 continue;
             }
 
-        
+            int passouFiltro = 1;
 
-        if(passouFiltro == 1) continue;
+            // Verificação dos filtros
+            if (buscaId && registro.idPoPs != filtroBusca.idPoPs)
+                passouFiltro = 0;
 
-        
+            if (buscaNomePoPs)
+            {
+                if (strcmp(filtroBusca.nomePoPs, "") == 0)
+                {
+                    if (strcmp(registro.nomePoPs, "$") != 0)
+                        passouFiltro = 0;
+                }
+                else if (strcmp(registro.nomePoPs, filtroBusca.nomePoPs) != 0)
+                    passouFiltro = 0;
+            }
 
-        encontrou = 1;
+            if (buscaNomePais)
+            {
+                if (strcmp(filtroBusca.nomePais, "") == 0)
+                {
+                    if (strcmp(registro.nomePais, "$") != 0)
+                        passouFiltro = 0;
+                }
+                else if (strcmp(registro.nomePais, filtroBusca.nomePais) != 0)
+                    passouFiltro = 0;
+            }
 
-        printf("%d %d ", registro.idPoPs, registro.idPopsConectado);
+            if (buscaSiglaPais)
+            {
+                if (strcmp(filtroBusca.siglaPais, "") == 0)
+                {
+                    if (registro.siglaPais[0] != '$')
+                        passouFiltro = 0;
+                }
+                else if (strncmp(registro.siglaPais, filtroBusca.siglaPais, 2) != 0)
+                    passouFiltro = 0;
+            }
 
+            if (passouFiltro)
+            {
+                encontrou = 1;
+                print_register(&registro);
+            }
 
-        //Condições
-        if (registro.velocidade == -1)
-        {
-            printf("NULO ");
+            free_register(&registro);
         }
-        else
+
+        // Caso não encontre registro válido
+        if (encontrou == 0)
         {
-            printf("%d ", registro.velocidade);
+            printf("Registro inexistente.\n");
         }
 
-        if (registro.unidadeMedida == '$')
-        {
-            printf("NULO\n");
-        }
-        else
-        {
-            printf("\"%c\"\n", registro.unidadeMedida);
-        }
-    
+        free(filtroBusca.nomePoPs);
+        free(filtroBusca.nomePais);
+
+        if (i < n)
+            printf("\n");
     }
-        //Caso não encontre registro válido
-    if(encontrou == 0){
-        printf("Registro inexistente.\n");
-    }
 
-    printf("\n");
-    }
-
-    fclose(arquivo); 
+    fclose(arquivo);
 }
