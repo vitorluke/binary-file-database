@@ -10,11 +10,7 @@
 #include "../include/register_header.h"
 #include "../include/select.h"
 
-// Estrutura de cada registro do arquivo de índice primário (12 bytes)
-typedef struct {
-    int idPoPs;         // Chave primária (4 bytes)
-    int64_t byteoffset; // Posição do registro no arquivo de dados (8 bytes)
-} IndexEntry;
+
 
 // Função de comparação para ordenar o vetor de índice de forma crescente por idPoPs
 static int compare_index(const void *a, const void *b)

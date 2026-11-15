@@ -10,6 +10,7 @@
 #include "../include/index.h"
 #include "../include/delete.h"
 #include "../include/insert.h"
+#include "../include/update.h"
 
 
 #define BUFFER 512
@@ -67,7 +68,7 @@ int main()
 
         case 14: // 14 arquivoEntrada.bin arquivoIndicePrimario.bin n[cite: 20]
             sscanf(buffer, "%d %s %s %d", &func_option, arquivoEntrada, arquivoIndice, &n);
-            // update_register(arquivoEntrada, arquivoIndice, n);
+            update_register(arquivoEntrada, arquivoIndice, n);
             break;
 
         default:

@@ -34,4 +34,11 @@ typedef struct {
 void read_header(Header *cabecalho, FILE *arquivo);
 int read_register(Register *registro, FILE *arquivo);
 
+
+// Estrutura auxiliar para armazenar uma entrada do arquivo de índice primário (12 bytes)
+typedef struct {
+    int idPoPs;         // Chave primária de busca (4 bytes)
+    int64_t byteoffset; // Byte offset do registro no arquivo de dados (8 bytes)
+} IndexEntry;
+
 #endif

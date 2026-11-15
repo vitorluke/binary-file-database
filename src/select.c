@@ -10,11 +10,7 @@
 #include "../include/fornecidas.h"
 #include "../include/register_header.h"
 
-// Estrutura auxiliar para armazenar uma entrada do arquivo de índice primário (12 bytes)
-typedef struct {
-    int idPoPs;         // Chave primária de busca (4 bytes)
-    int64_t byteoffset; // Byte offset do registro no arquivo de dados (8 bytes)
-} IndexEntry;
+
 
 /*
  * Procedimento: print_register

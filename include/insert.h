@@ -6,6 +6,10 @@
 
 #include "register_header.h"
 
+void write_register(FILE *arquivo, Register novoRegistro, int64_t posicao, int tamPoPs, int tamPais);
+
+void adicionar_ao_indice_em_memoria(IndexEntry **indice, int *totalIndices, int idNovo, int64_t offsetNovo);
+
 void insert_into(char *arquivoEntrada, char *arquivoIndice, int n);
 
 #endif
