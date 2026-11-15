@@ -9,6 +9,7 @@
 #include "../include/select.h"
 #include "../include/index.h"
 #include "../include/delete.h"
+#include "../include/insert.h"
 
 
 #define BUFFER 512
@@ -61,7 +62,7 @@ int main()
 
         case 13: // 13 arquivoEntrada.bin arquivoIndicePrimario.bin n[cite: 18]
             sscanf(buffer, "%d %s %s %d", &func_option, arquivoEntrada, arquivoIndice, &n);
-            // insert_into(arquivoEntrada, arquivoIndice, n);
+            insert_into(arquivoEntrada, arquivoIndice, n);
             break;
 
         case 14: // 14 arquivoEntrada.bin arquivoIndicePrimario.bin n[cite: 20]
